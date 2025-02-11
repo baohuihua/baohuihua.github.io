@@ -5,6 +5,19 @@
     
     <entry>
       <title>post</title>
+      <link href="/2025/02/10/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/"/>
+      <url>/2025/02/10/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/</url>
+      
+        <content type="html"><![CDATA[<p>最近一直在准备ciscn半决赛，学了很久的java反序列化，看了看java安全漫谈，现在来总结一下java安全的内容</p><h1 id="URLdns链"><a href="#URLdns链" class="headerlink" title="URLdns链"></a>URLdns链</h1><p>readobject-&gt;</p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>post</title>
       <link href="/2025/02/10/post/"/>
       <url>/2025/02/10/post/</url>
       
@@ -21,7 +34,7 @@
       <link href="/2025/02/09/nihao/"/>
       <url>/2025/02/09/nihao/</url>
       
-        <content type="html"><![CDATA[<p>今天成功搭建了自己的网站，也是耗费了不久的时间，希望以后在ctf的学习之路上也能多多记录吧，在此留下痕迹。66666666666！</p><p><img src="/images/qm.png"></p>]]></content>
+        <content type="html"><![CDATA[<p>今天成功搭建了自己的网站，也是耗费了不久的时间，希望以后在ctf的学习之路上也能多多记录吧，在此留下痕迹。66666666666！阿斯顿发斯蒂芬打发打发</p><p><img src="/images/qm.jpg"></p>]]></content>
       
       
       
