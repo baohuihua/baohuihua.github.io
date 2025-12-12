@@ -17,6 +17,25 @@
     
     
     <entry>
+      <title>maze靶场api</title>
+      <link href="/2025/12/12/api/"/>
+      <url>/2025/12/12/api/</url>
+      
+        <content type="html"><![CDATA[<p><img src="/../images/image-20251211153136755.png" alt="image-20251211153136755"></p><p>Nmap扫端口，访问80端口。</p><p><img src="/../images/image-20251211153148455.png" alt="image-20251211153148455"></p><p>观察源代码，发现新的目录</p><p><img src="/../images/wps1.jpg" alt="img"> </p><p>尝试访问backend-api路径。</p><p><img src="/../images/image-20251211153214584.png" alt="image-20251211153214584"></p><p>访问file.php</p><p><img src="/../images/image-20251211153240072.png" alt="image-20251211153240072"></p><p> 这里我们bp发包</p><p><img src="/../images/image-20251211153348413.png" alt="image-20251211153348413"></p><p>上传了一句话木马。蚁剑连接</p><p><img src="/../images/image-20251211153446631.png" alt="image-20251211153446631"></p><p>收集信息，发现了固定密码和用户</p><p><img src="/../images/image-20251211153836930.png" alt="image-20251211153836930"></p><p><img src="/../images/image-20251211153601008.png" alt="image-20251211153601008"></p><p>这个密码既可以登录网页，也可以登录ssh</p><p>ssh登录，得到flag</p><p><img src="/../images/image-20251211153804760.png" alt="image-20251211153804760"></p><p>sudo提权发现有hashcat。</p><p><img src="/../images/image-20251211153916599.png" alt="image-20251211153916599"></p><p>这里可以直接读flag</p><p><img src="/../images/image-20251211154018564.png" alt="image-20251211154018564"></p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> 靶场 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>数据库安全</title>
       <link href="/2025/03/31/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/"/>
       <url>/2025/03/31/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8F%90%E6%9D%83/</url>
