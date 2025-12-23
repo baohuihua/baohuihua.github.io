@@ -17,6 +17,25 @@
     
     
     <entry>
+      <title>vulnyx-Observer</title>
+      <link href="/2025/12/23/vulnyx%20-Observer/"/>
+      <url>/2025/12/23/vulnyx%20-Observer/</url>
+      
+        <content type="html"><![CDATA[<h1 id="vulnyx-Observer"><a href="#vulnyx-Observer" class="headerlink" title="vulnyx -Observer"></a>vulnyx -Observer</h1><p>nmap扫一下端口</p><p><img src="/../images/image-20251223142421256.png" alt="image-20251223142421256"></p><p>我们可以看到，OpenSSH 正在端口 80 上运行<code>22</code>，Apache httpd 服务器正在端口 80 上运行。</p><p>扫描网页目录但是没有发现。</p><p>访问80网页</p><p><img src="/../images/image-20251223143248019.png" alt="image-20251223143248019"></p><p>发现有人名，尝试ssh爆破。</p><p>用cewl生成密码字典。</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cewl http://192.168.56.114 -w dict.txt</span><br></pre></td></tr></table></figure><p><img src="/../images/image-20251223143849247.png" alt="image-20251223143849247"></p><p><img src="/../images/image-20251223144306384.png" alt="image-20251223144306384"></p><p><img src="/../images/image-20251223144339391.png" alt="image-20251223144339391"></p><p>ssh登录不了。因此要用x11转发登录。</p><p><img src="/../images/image-20251223144441928.png" alt="image-20251223144441928"></p><p>登录发现remo的凭证</p><p><code>remo:REMisGOD</code></p><p>ssh连接上，env发现rootkey变量。</p><p><img src="/../images/image-20251223144917045.png" alt="image-20251223144917045"></p><p>是base64编码的私钥。我们解码为id文件。</p><p><img src="/../images/image-20251223145018962.png" alt="image-20251223145018962"></p><p><img src="/../images/image-20251223145044017.png" alt="image-20251223145044017"></p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">remo@observer:~$ echo $rootKEY |base64 -d &gt;id1</span><br></pre></td></tr></table></figure><p>用它登录root</p><p><img src="/../images/image-20251223145155850.png" alt="image-20251223145155850"></p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> 靶场 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>maze靶场api</title>
       <link href="/2025/12/12/api/"/>
       <url>/2025/12/12/api/</url>
